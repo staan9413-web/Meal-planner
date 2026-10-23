@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Helper Meal Prep & WhatsApp Generator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        emerald: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                        },
+                        amber: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+<body class="h-full font-sans text-slate-800 antialiased flex flex-col selection:bg-emerald-100 selection:text-emerald-800">
+
+    <!-- Top Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-md shadow-emerald-200">
+                    <i class="fa-solid font-bold fa-utensils text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-900 leading-tight">Meal Prep Helper</h1>
+                    <p class="text-xs text-slate-500">Daily WhatsApp Instructions Generator</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <button onclick="openManageCategoriesModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors text-xs font-semibold">
+                    <i class="fa-solid fa-folder-plus text-slate-500"></i>
+                    <span>Categories</span>
+                </button>
+                <button onclick="openManagePresetsModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors text-xs font-semibold">
+                    <i class="fa-regular fa-bookmark"></i>
+                    <span>Presets</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-4xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Column: Meal Builder (lg:col-span-7) -->
+        <div class="lg:col-span-7 space-y-5">
+            
+            <!-- Quick Presets Bar -->
+            <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> Quick Presets
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="openSavePresetModal()" class="text-xs text-amber-600 hover:underline font-semibold flex items-center gap-1">
+                            <i class="fa-solid fa-plus-circle"></i> Save Current
+                        </button>
+                        <span class="text-slate-300">|</span>
+                        <button onclick="openManagePresetsModal()" class="text-xs text-emerald-600 hover:underline font-semibold">
+                            Manage
+                        </button>
+                        <span class="text-slate-300">|</span>
+                        <button onclick="clearAllSections()" class="text-xs text-slate-400 hover:text-red-500 transition-colors">
+                            <i class="fa-solid fa-trash-can mr-1"></i>Clear
+                        </button>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2" id="preset-buttons-container">
+                    <!-- Dynamic Preset Buttons -->
+                </div>
+            </div>
+
+            <!-- Meal Section Tabs -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <!-- Tab Navigation Buttons -->
+                <div class="flex border-b border-slate-200 bg-slate-50/80 p-1.5 gap-1 overflow-x-auto">
+                    <button onclick="switchMealTab('babyLunch')" id="tab-btn-babyLunch" class="meal-tab-btn flex-1 min-w-[90px] py-2 px-2.5 rounded-xl text-xs font-semibold text-center transition-all flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-baby text-amber-500"></i> Baby Lunch
+                    </button>
+                    <button onclick="switchMealTab('babyDinner')" id="tab-btn-babyDinner" class="meal-tab-btn flex-1 min-w-[90px] py-2 px-2.5 rounded-xl text-xs font-semibold text-center transition-all flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-moon text-indigo-500"></i> Baby Dinner
+                    </button>
+                    <button onclick="switchMealTab('ourDinner')" id="tab-btn-ourDinner" class="meal-tab-btn flex-1 min-w-[90px] py-2 px-2.5 rounded-xl text-xs font-semibold text-center transition-all flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-utensils text-emerald-600"></i> Our Dinner
+                    </button>
+                    <button onclick="switchMealTab('customNotes')" id="tab-btn-customNotes" class="meal-tab-btn flex-1 min-w-[90px] py-2 px-2.5 rounded-xl text-xs font-semibold text-center transition-all flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-note-sticky text-rose-500"></i> Notes
+                    </button>
+                </div>
+
+                <!-- Tab Content Body -->
+                <div class="p-4 space-y-4">
+
+                    <!-- Active Section Banner -->
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                        <h2 class="font-bold text-slate-800 text-sm flex items-center gap-2" id="current-section-title">
+                            <!-- Title inserted dynamically -->
+                        </h2>
+                        <span class="text-xs text-slate-400" id="current-section-format-badge">Bulleted Checklist</span>
+                    </div>
+
+                    <!-- Categorized Ingredients Selection Palette -->
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-xs font-bold text-slate-600">Select Items to Add:</label>
+                            <button onclick="openManageCategoriesModal()" class="text-[11px] text-emerald-600 hover:underline font-semibold">
+                                + Add / Manage Categories
+                            </button>
+                        </div>
+                        
+                        <!-- Dynamic Categories Palette -->
+                        <div class="space-y-3" id="categories-palette-container">
+                            <!-- Dynamically populated categories and pills -->
+                        </div>
+                    </div>
+
+                    <!-- Custom Add Input -->
+                    <div class="pt-2 border-t border-slate-100">
+                        <form onsubmit="handleAddCustomItem(event)" class="flex gap-2">
+                            <input type="text" id="custom-item-input" placeholder="Type custom instruction (e.g. '3 cloves of garlic')..." class="flex-1 text-xs px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-slate-50/50">
+                            <button type="submit" class="px-3.5 py-2 bg-slate-800 text-white rounded-xl text-xs font-semibold hover:bg-slate-900 transition-colors flex items-center gap-1">
+                                <i class="fa-solid fa-plus"></i> Add
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Active Items List in Current Section -->
+                    <div class="pt-2">
+                        <label class="block text-xs font-semibold text-slate-500 mb-2">Current Items in Section:</label>
+                        <div id="active-items-list" class="space-y-2 min-h-[100px] max-h-[220px] overflow-y-auto pr-1 custom-scrollbar">
+                            <!-- Items list populated dynamically -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Live WhatsApp Preview & Actions (lg:col-span-5) -->
+        <div class="lg:col-span-5 flex flex-col space-y-4">
+            
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col flex-1 overflow-hidden">
+                <!-- Preview Header -->
+                <div class="bg-emerald-700 text-white px-4 py-3 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-xl text-emerald-300"></i>
+                        <span class="font-bold text-sm tracking-wide">WhatsApp Message Preview</span>
+                    </div>
+                    <span class="text-[10px] bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded-full font-medium">Real-time</span>
+                </div>
+
+                <!-- Preview Box (Styled like WhatsApp Chat Bubble) -->
+                <div class="p-4 bg-[#efeae2] flex-1 min-h-[280px] max-h-[420px] overflow-y-auto custom-scrollbar relative">
+                    <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-200 text-slate-800 text-xs sm:text-sm font-sans leading-relaxed whitespace-pre-wrap select-all" id="whatsapp-preview-text">
+                        <!-- Preview content auto-filled -->
+                    </div>
+                </div>
+
+                <!-- Footer Action Buttons -->
+                <div class="p-3.5 bg-slate-50 border-t border-slate-200 space-y-2">
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="copyToClipboard()" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-xl text-xs transition-colors flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-regular fa-copy"></i>
+                            <span>Copy Text</span>
+                        </button>
+                        <button onclick="openSavePresetModal()" class="w-full py-2.5 px-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-xl text-xs transition-colors flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-bookmark"></i>
+                            <span>Save as Preset</span>
+                        </button>
+                    </div>
+                    <button onclick="sendToWhatsApp()" class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20">
+                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                        <span>Send via WhatsApp</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Multi Prep Action Builder Modal -->
+    <div id="prep-action-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-slate-100 space-y-4 animate-fadeIn">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
+                        <i class="fa-solid fa-scissors"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">Prep Action Builder</h3>
+                        <p class="text-[11px] text-slate-500">Ingredient: <strong id="builder-ingredient-title" class="text-amber-700 font-bold"></strong></p>
+                    </div>
+                </div>
+                <button onclick="closePrepActionModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Action Selectors -->
+            <div>
+                <label class="block text-xs font-bold text-slate-600 mb-2">Select Prep Actions (Multi-Select):</label>
+                <div class="flex flex-wrap gap-2 max-h-[160px] overflow-y-auto p-1 custom-scrollbar" id="builder-action-chips">
+                    <!-- Dynamic multi-select action chips -->
+                </div>
+            </div>
+
+            <!-- Generated Sentence Live Preview -->
+            <div class="bg-amber-50/80 border border-amber-200/80 p-3 rounded-xl space-y-1">
+                <span class="text-[10px] font-bold uppercase tracking-wide text-amber-800 flex items-center gap-1">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-600"></i> Generated Sentence Preview
+                </span>
+                <input type="text" id="generated-sentence-input" class="w-full text-xs font-semibold text-slate-800 bg-white border border-amber-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-amber-500/20">
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                <button onclick="addPlainIngredientOnly()" class="text-xs text-slate-500 hover:text-slate-800 font-semibold underline">
+                    Add Plain Ingredient
+                </button>
+                <div class="flex gap-2">
+                    <button onclick="closePrepActionModal()" class="px-3.5 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-100 rounded-xl">
+                        Cancel
+                    </button>
+                    <button onclick="confirmAndAddGeneratedSentence()" class="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-check"></i> Add to Menu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Categories & Items Modal -->
+    <div id="manage-categories-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl border border-slate-100 space-y-4 max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 flex-shrink-0">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-folder-tree text-emerald-600"></i> Manage Categories & Items
+                </h3>
+                <button onclick="closeManageCategoriesModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Create New Category Row -->
+            <form onsubmit="handleCreateNewCategory(event)" class="flex gap-2 flex-shrink-0 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                <input type="text" id="new-category-name-input" placeholder="New Category Name (e.g. Seafood, Sauces)..." class="flex-1 text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white">
+                <button type="submit" class="px-3.5 py-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 transition-colors flex items-center gap-1">
+                    <i class="fa-solid fa-plus"></i> Add
+                </button>
+            </form>
+
+            <!-- Category List & Re-Order Control -->
+            <div class="flex-shrink-0 space-y-1">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Category Display Order:</span>
+                <div class="flex border-b border-slate-100 gap-1.5 overflow-x-auto pb-2 custom-scrollbar" id="manage-category-tabs">
+                    <!-- Dynamically populated category tabs with re-order arrows -->
+                </div>
+            </div>
+
+            <!-- Active Category Content Management -->
+            <div class="space-y-3 flex-1 overflow-y-auto pr-1 custom-scrollbar">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-500" id="active-manage-category-title">Items in Category:</span>
+                    <button id="delete-category-btn" onclick="deleteCurrentCategory()" class="text-[11px] text-red-500 hover:underline font-semibold hidden">
+                        <i class="fa-solid fa-trash mr-1"></i>Delete Category
+                    </button>
+                </div>
+
+                <form onsubmit="handleAddNewCategoryItem(event)" class="flex gap-2">
+                    <input type="text" id="new-category-item-input" placeholder="Add new item to this category..." class="flex-1 text-xs px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
+                    <button type="submit" class="px-3.5 py-2 bg-slate-800 text-white rounded-xl text-xs font-semibold hover:bg-slate-900 transition-colors">
+                        Add Item
+                    </button>
+                </form>
+
+                <div id="category-items-manage-list" class="space-y-1.5">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex justify-between items-center flex-shrink-0">
+                <button onclick="resetCategoryCatalogToDefault()" class="text-xs text-rose-500 hover:text-rose-700 font-semibold">
+                    <i class="fa-solid fa-rotate-left mr-1"></i>Reset All Defaults
+                </button>
+                <button onclick="closeManageCategoriesModal()" class="px-4 py-2 bg-slate-800 text-white font-semibold rounded-xl text-xs hover:bg-slate-900 transition-colors">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Preset Modal -->
+    <div id="save-preset-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-100 space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-bookmark text-amber-500"></i> Save Current Menu as Preset
+                </h3>
+                <button onclick="closeSavePresetModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Preset Name:</label>
+                <input type="text" id="save-preset-name-input" placeholder="e.g. Wednesday Seafood Routine" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeSavePresetModal()" class="px-3.5 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-100 rounded-xl">Cancel</button>
+                <button onclick="confirmSaveCurrentPreset()" class="px-4 py-2 text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 rounded-xl shadow-sm">Save Preset</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Saved Presets Management Modal -->
+    <div id="presets-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl border border-slate-100 space-y-4 max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 flex-shrink-0">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-bookmark text-emerald-600"></i> Saved Meal Presets
+                </h3>
+                <button onclick="closeManagePresetsModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div id="custom-presets-list" class="space-y-3 flex-1 overflow-y-auto pr-1 custom-scrollbar">
+                <!-- Dynamic user templates populated here -->
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex justify-between items-center flex-shrink-0">
+                <button onclick="openSavePresetModal(); closeManagePresetsModal();" class="px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-semibold rounded-xl text-xs transition-colors flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> Save Current Menu as New Preset
+                </button>
+                <button onclick="closeManagePresetsModal()" class="px-4 py-2 bg-slate-100 text-slate-700 font-semibold rounded-xl text-xs hover:bg-slate-200 transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Preset Modal -->
+    <div id="edit-preset-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-slate-100 space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <h3 class="font-bold text-slate-800 text-sm">Edit Preset Name</h3>
+                <button onclick="closeEditPresetModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <input type="hidden" id="edit-preset-id">
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Preset Title:</label>
+                <input type="text" id="edit-preset-name-input" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
+            </div>
+            <div class="flex justify-between items-center pt-2">
+                <button onclick="updateCurrentSelectionToPreset()" class="text-xs text-emerald-600 hover:underline font-semibold">
+                    Overwrites with current active selections
+                </button>
+                <div class="flex gap-2">
+                    <button onclick="closeEditPresetModal()" class="px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-100 rounded-lg">Cancel</button>
+                    <button onclick="savePresetEdit()" class="px-3.5 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2 transition-all transform translate-y-10 opacity-0 pointer-events-none z-50">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+        <span id="toast-message">Action completed successfully!</span>
+    </div>
+
+    <!-- Application Script Logic -->
+    <script>
+        // Default Catalog Categories
+        const DEFAULT_CATEGORIES = [
+            { id: 'proteins', name: 'Proteins', items: ["Bread", "Dumplings", "Shrimp", "Chicken", "Salmon", "Pork ribs", "Beef", "Tofu", "Egg", "Fish Fillet"] },
+            { id: 'veggies', name: 'Veggies & Carbs', items: ["Carrot", "Tomato", "Cucumber", "White radish", "Broccoli", "Spinach", "Corn", "Potato", "Pumpkin", "Rice"] },
+            { id: 'aromatics', name: 'Aromatics', items: ["Garlic", "Onion", "Ginger", "Spring onion", "Shallots", "Coriander"] },
+            { id: 'prepActions', name: 'Prep Actions', items: ["Wash", "Peel", "Slice", "Dice", "Defrost", "Clean", "Chop", "Saute", "3 cloves of", "Cut half of", "Cook rice", "Steam", "Boil", "Soak"] }
+        ];
+
+        // Default Meal Presets
+        const DEFAULT_PRESETS = [
+            {
+                id: 'preset-1',
+                name: "Standard Salmon & Rice",
+                data: {
+                    babyLunch: ["Bread", "Dumplings", "Shrimp"],
+                    babyDinner: ["Tomato", "Cucumber", "Chicken", "Salmon", "Rice"],
+                    ourDinner: ["3 cloves of garlic", "Slice the onion", "Cut half of the white radish into pieces", "Defrost the pork ribs", "Cook rice"],
+                    customNotes: ""
+                }
+            },
+            {
+                id: 'preset-2',
+                name: "Quick Dumplings Day",
+                data: {
+                    babyLunch: ["Steam Dumplings", "Apple slices"],
+                    babyDinner: ["Wash and slice the carrot", "Steam broccoli", "Chicken", "Rice"],
+                    ourDinner: ["Dice ginger", "Chop spring onion", "Cook dumpling soup", "Cook rice"],
+                    customNotes: "Please make sure to soak vegetables in salt water first."
+                }
+            }
+        ];
+
+        // Active State
+        let categories = [];
+        let presets = [];
+        let mealState = {
+            babyLunch: [],
+            babyDinner: [],
+            ourDinner: [],
+            customNotes: ""
+        };
+
+        let currentActiveTab = 'babyLunch';
+        let currentManageCategoryTabId = 'proteins';
+        let activeBuilderIngredient = null;
+        let selectedPrepActions = new Set();
+
+        // Init
+        window.onload = function() {
+            loadCategoriesFromStorage();
+            loadPresetsFromStorage();
+            renderPresetButtons();
+            switchMealTab('babyLunch');
+            renderCategoryPalette();
+            applyPreset('preset-1');
+        };
+
+        // Storage Handlers
+        function loadCategoriesFromStorage() {
+            try {
+                const stored = localStorage.getItem('helper_meal_categories_v3');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        categories = parsed;
+                    } else {
+                        categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+                    }
+                } else {
+                    categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+                }
+            } catch(e) {
+                categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+            }
+        }
+
+        function saveCategoriesToStorage() {
+            localStorage.setItem('helper_meal_categories_v3', JSON.stringify(categories));
+            renderCategoryPalette();
+        }
+
+        function loadPresetsFromStorage() {
+            try {
+                const stored = localStorage.getItem('helper_meal_presets_v3');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        presets = parsed;
+                    } else {
+                        presets = JSON.parse(JSON.stringify(DEFAULT_PRESETS));
+                    }
+                } else {
+                    presets = JSON.parse(JSON.stringify(DEFAULT_PRESETS));
+                }
+            } catch(e) {
+                presets = JSON.parse(JSON.stringify(DEFAULT_PRESETS));
+            }
+        }
+
+        function savePresetsToStorage() {
+            localStorage.setItem('helper_meal_presets_v3', JSON.stringify(presets));
+            renderPresetButtons();
+        }
+
+        function resetCategoryCatalogToDefault() {
+            if (confirm("Reset all categories and ingredients to default defaults?")) {
+                categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+                presets = JSON.parse(JSON.stringify(DEFAULT_PRESETS));
+                saveCategoriesToStorage();
+                savePresetsToStorage();
+                renderManageCategoryTabs();
+                renderManageCategoryList();
+                showToast("Reset to factory defaults.");
+            }
+        }
+
+        // --- Render Ingredients Palette ---
+        function renderCategoryPalette() {
+            const container = document.getElementById('categories-palette-container');
+            if (!categories || categories.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 italic">No categories found. Click + Add / Manage Categories to create one.</p>`;
+                return;
+            }
+
+            container.innerHTML = categories.map(cat => {
+                const isPrepActionCategory = cat.id === 'prepActions';
+                const pillButtons = cat.items.map(item => {
+                    if (isPrepActionCategory) {
+                        return `
+                            <button type="button" onclick="quickAddStandalonePrepAction('${escapeHtml(item)}')" class="text-xs px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition-colors border border-indigo-200/60 active:scale-95">
+                                ⚡ ${escapeHtml(item)}
+                            </button>
+                        `;
+                    } else {
+                        return `
+                            <button type="button" onclick="openPrepActionModal('${escapeHtml(item)}')" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors border border-slate-200/60 active:scale-95">
+                                + ${escapeHtml(item)}
+                            </button>
+                        `;
+                    }
+                }).join('');
+
+                return `
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-1">${escapeHtml(cat.name)}</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            ${pillButtons.length > 0 ? pillButtons : '<span class="text-[11px] text-slate-300 italic">Empty category</span>'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // --- Multi Prep Action Modal & Sentence Generator Logic ---
+        function openPrepActionModal(ingredient) {
+            activeBuilderIngredient = ingredient;
+            selectedPrepActions.clear();
+            document.getElementById('builder-ingredient-title').innerText = ingredient;
+
+            // Render available prep actions
+            const prepCat = categories.find(c => c.id === 'prepActions');
+            const prepItems = prepCat ? prepCat.items : ["Wash", "Peel", "Slice", "Dice", "Defrost", "3 cloves of"];
+
+            renderActionChips(prepItems);
+            updateGeneratedSentencePreview();
+
+            document.getElementById('prep-action-modal').classList.remove('hidden');
+        }
+
+        function closePrepActionModal() {
+            activeBuilderIngredient = null;
+            selectedPrepActions.clear();
+            document.getElementById('prep-action-modal').classList.add('hidden');
+        }
+
+        function renderActionChips(prepItems) {
+            const container = document.getElementById('builder-action-chips');
+            container.innerHTML = prepItems.map(action => {
+                const isSelected = selectedPrepActions.has(action);
+                const activeClass = isSelected 
+                    ? 'bg-amber-500 text-white border-amber-600 font-bold shadow-sm' 
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200 font-medium';
+
+                return `
+                    <button type="button" onclick="togglePrepActionSelection('${escapeHtml(action)}')" class="text-xs px-3 py-1.5 rounded-xl border transition-all active:scale-95 flex items-center gap-1.5 ${activeClass}">
+                        ${isSelected ? '<i class="fa-solid fa-check text-[10px]"></i>' : ''} ${escapeHtml(action)}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function togglePrepActionSelection(action) {
+            if (selectedPrepActions.has(action)) {
+                selectedPrepActions.delete(action);
+            } else {
+                selectedPrepActions.add(action);
+            }
+
+            const prepCat = categories.find(c => c.id === 'prepActions');
+            const prepItems = prepCat ? prepCat.items : [];
+            renderActionChips(prepItems);
+            updateGeneratedSentencePreview();
+        }
+
+        /**
+         * Natural English Sentence Generator Engine
+         */
+        function generateNaturalSentence(ingredient, actionsArray) {
+            if (!ingredient) return "";
+            if (!actionsArray || actionsArray.length === 0) return ingredient;
+
+            const ingLower = ingredient.toLowerCase().trim();
+
+            // Check if any action is a quantity/prefix expression
+            const prefixAction = actionsArray.find(a => 
+                a.toLowerCase().includes("cloves of") || 
+                a.toLowerCase().includes("half of") || 
+                a.toLowerCase().includes("piece of") ||
+                a.toLowerCase().includes("slices of")
+            );
+
+            // Regular verb prep actions
+            const verbActions = actionsArray.filter(a => a !== prefixAction).map(a => a.toLowerCase().trim());
+
+            // Determine article or prefix noun
+            let nounPhrase = "";
+            if (prefixAction) {
+                nounPhrase = `${prefixAction.toLowerCase()} ${ingLower}`;
+            } else {
+                const isPluralOrMass = ingLower.endsWith('s') || ingLower === 'rice' || ingLower === 'pork ribs' || ingLower === 'beef' || ingLower === 'tofu';
+                nounPhrase = isPluralOrMass ? `the ${ingLower}` : `the ${ingLower}`;
+            }
+
+            if (verbActions.length === 0) {
+                return capitalizeFirstLetter(nounPhrase);
+            }
+
+            let combinedVerbs = "";
+            if (verbActions.length === 1) {
+                combinedVerbs = capitalizeFirstLetter(verbActions[0]);
+            } else if (verbActions.length === 2) {
+                combinedVerbs = `${capitalizeFirstLetter(verbActions[0])} and ${verbActions[1]}`;
+            } else {
+                const lastVerb = verbActions[verbActions.length - 1];
+                const initialVerbs = verbActions.slice(0, -1).map((v, i) => i === 0 ? capitalizeFirstLetter(v) : v).join(", ");
+                combinedVerbs = `${initialVerbs}, and ${lastVerb}`;
+            }
+
+            return `${combinedVerbs} ${nounPhrase}`;
+        }
+
+        function capitalizeFirstLetter(string) {
+            if (!string) return '';
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        function updateGeneratedSentencePreview() {
+            const sentence = generateNaturalSentence(activeBuilderIngredient, Array.from(selectedPrepActions));
+            document.getElementById('generated-sentence-input').value = sentence;
+        }
+
+        function confirmAndAddGeneratedSentence() {
+            const inputVal = document.getElementById('generated-sentence-input').value.trim();
+            if (inputVal) {
+                addItemToCurrentSection(inputVal);
+            }
+            closePrepActionModal();
+        }
+
+        function addPlainIngredientOnly() {
+            if (activeBuilderIngredient) {
+                addItemToCurrentSection(activeBuilderIngredient);
+            }
+            closePrepActionModal();
+        }
+
+        function quickAddStandalonePrepAction(action) {
+            addItemToCurrentSection(action);
+        }
+
+        function addItemToCurrentSection(itemText) {
+            if (currentActiveTab === 'customNotes') {
+                mealState.customNotes = mealState.customNotes ? `${mealState.customNotes}\n${itemText}` : itemText;
+            } else {
+                mealState[currentActiveTab].push(itemText);
+            }
+            renderActiveItemsList();
+            updateWhatsAppPreview();
+        }
+
+        // --- Tabs and Active Items Handling ---
+        function switchMealTab(tabKey) {
+            currentActiveTab = tabKey;
+
+            const tabs = ['babyLunch', 'babyDinner', 'ourDinner', 'customNotes'];
+            tabs.forEach(tab => {
+                const btn = document.getElementById(`tab-btn-${tab}`);
+                if (tab === tabKey) {
+                    btn.className = "meal-tab-btn flex-1 min-w-[90px] py-2 px-2.5 rounded-xl text-xs font-bold text-center transition-all bg-white text-emerald-700 shadow-sm border border-slate-200";
+                } else {
+                    btn.className = "meal-tab-btn flex-1 min-w-[90px] py-2 px-2.5 rounded-xl text-xs font-semibold text-center transition-all text-slate-500 hover:text-slate-800 hover:bg-white/50";
+                }
+            });
+
+            const titleEl = document.getElementById('current-section-title');
+            const badgeEl = document.getElementById('current-section-format-badge');
+
+            if (tabKey === 'babyLunch') {
+                titleEl.innerHTML = `<i class="fa-solid fa-baby text-amber-500"></i> Baby’s Lunch Items`;
+                badgeEl.innerText = "Bulleted Checklist";
+            } else if (tabKey === 'babyDinner') {
+                titleEl.innerHTML = `<i class="fa-solid fa-moon text-indigo-500"></i> Baby’s Dinner Items`;
+                badgeEl.innerText = "Bulleted Checklist";
+            } else if (tabKey === 'ourDinner') {
+                titleEl.innerHTML = `<i class="fa-solid fa-utensils text-emerald-600"></i> Our Dinner Steps & Items`;
+                badgeEl.innerText = "Bulleted Checklist";
+            } else if (tabKey === 'customNotes') {
+                titleEl.innerHTML = `<i class="fa-solid fa-note-sticky text-rose-500"></i> Notes / Instructions`;
+                badgeEl.innerText = "Bulleted Checklist";
+            }
+
+            renderActiveItemsList();
+        }
+
+        function renderActiveItemsList() {
+            const listContainer = document.getElementById('active-items-list');
+
+            if (currentActiveTab === 'customNotes') {
+                listContainer.innerHTML = `
+                    <textarea id="custom-notes-textarea" oninput="updateCustomNotes(this.value)" rows="4" placeholder="Enter special requests, e.g., 'Soak pork ribs in cold water for 15 mins' or 'Dinner at 7:30 PM'..." class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-slate-50/50">${escapeHtml(mealState.customNotes)}</textarea>
+                `;
+                return;
+            }
+
+            const currentItems = mealState[currentActiveTab];
+
+            if (!currentItems || currentItems.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="py-6 text-center text-slate-400 text-xs italic bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
+                        No items added yet. Click tags above or type custom instructions.
+                    </div>
+                `;
+                return;
+            }
+
+            listContainer.innerHTML = currentItems.map((item, index) => `
+                <div class="flex items-center gap-2 p-2 bg-slate-50 hover:bg-slate-100/80 rounded-xl border border-slate-200/80 transition-colors group">
+                    <span class="text-xs text-slate-400 font-mono w-4 text-center">${index + 1}.</span>
+                    <input type="text" value="${escapeHtml(item)}" onchange="updateItemValue(${index}, this.value)" class="flex-1 bg-transparent text-xs text-slate-700 font-medium focus:outline-none focus:bg-white focus:px-2 focus:py-1 focus:rounded-lg focus:border focus:border-emerald-400">
+                    <button onclick="removeItem(${index})" class="text-slate-400 hover:text-red-500 p-1 text-xs transition-colors">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function handleAddCustomItem(e) {
+            e.preventDefault();
+            const input = document.getElementById('custom-item-input');
+            const value = input.value.trim();
+            if (!value) return;
+
+            addItemToCurrentSection(value);
+            input.value = '';
+        }
+
+        function updateItemValue(index, newValue) {
+            if (newValue.trim() === '') {
+                removeItem(index);
+            } else {
+                mealState[currentActiveTab][index] = newValue.trim();
+                updateWhatsAppPreview();
+            }
+        }
+
+        function removeItem(index) {
+            mealState[currentActiveTab].splice(index, 1);
+            renderActiveItemsList();
+            updateWhatsAppPreview();
+        }
+
+        function updateCustomNotes(text) {
+            mealState.customNotes = text;
+            updateWhatsAppPreview();
+        }
+
+        function clearAllSections() {
+            if (confirm("Are you sure you want to clear all meal sections?")) {
+                mealState = { babyLunch: [], babyDinner: [], ourDinner: [], customNotes: "" };
+                renderActiveItemsList();
+                updateWhatsAppPreview();
+                showToast("All sections cleared.");
+            }
+        }
+
+        // --- Category Management Modals & Logic ---
+        function openManageCategoriesModal() {
+            document.getElementById('manage-categories-modal').classList.remove('hidden');
+            renderManageCategoryTabs();
+            switchManageCategoryTab(currentManageCategoryTabId);
+        }
+
+        function closeManageCategoriesModal() {
+            document.getElementById('manage-categories-modal').classList.add('hidden');
+        }
+
+        function renderManageCategoryTabs() {
+            const tabsContainer = document.getElementById('manage-category-tabs');
+            tabsContainer.innerHTML = categories.map((cat, index) => `
+                <div id="manage-cat-tab-wrap-${cat.id}" class="flex items-center rounded-xl border border-slate-200 bg-white p-1 gap-0.5 flex-shrink-0">
+                    <button onclick="switchManageCategoryTab('${cat.id}')" id="manage-cat-tab-${cat.id}" class="py-1 px-2 text-xs font-semibold text-slate-600 whitespace-nowrap transition-colors">
+                        ${escapeHtml(cat.name)}
+                    </button>
+                    <div class="flex items-center border-l border-slate-200 pl-1 gap-0.5">
+                        <button onclick="moveCategoryPosition(${index}, -1)" ${index === 0 ? 'disabled class="text-slate-200 px-1 text-[10px]"' : 'class="text-slate-400 hover:text-emerald-600 px-1 text-[10px]"'} title="Move Left/Up">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button onclick="moveCategoryPosition(${index}, 1)" ${index === categories.length - 1 ? 'disabled class="text-slate-200 px-1 text-[10px]"' : 'class="text-slate-400 hover:text-emerald-600 px-1 text-[10px]"'} title="Move Right/Down">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function moveCategoryPosition(index, direction) {
+            const targetIndex = index + direction;
+            if (targetIndex < 0 || targetIndex >= categories.length) return;
+
+            const temp = categories[index];
+            categories[index] = categories[targetIndex];
+            categories[targetIndex] = temp;
+
+            saveCategoriesToStorage();
+            renderManageCategoryTabs();
+            switchManageCategoryTab(categories[targetIndex].id);
+            showToast("Category order updated.");
+        }
+
+        function switchManageCategoryTab(catId) {
+            currentManageCategoryTabId = catId;
+            categories.forEach(cat => {
+                const btnWrap = document.getElementById(`manage-cat-tab-wrap-${cat.id}`);
+                const btn = document.getElementById(`manage-cat-tab-${cat.id}`);
+                if (btn && btnWrap) {
+                    if (cat.id === catId) {
+                        btnWrap.className = "flex items-center rounded-xl border border-emerald-300 bg-emerald-50 p-1 gap-0.5 flex-shrink-0 shadow-sm";
+                        btn.className = "py-1 px-2 text-xs font-bold text-emerald-800 whitespace-nowrap";
+                    } else {
+                        btnWrap.className = "flex items-center rounded-xl border border-slate-200 bg-white p-1 gap-0.5 flex-shrink-0";
+                        btn.className = "py-1 px-2 text-xs font-semibold text-slate-600 hover:text-slate-900 whitespace-nowrap";
+                    }
+                }
+            });
+
+            const activeCat = categories.find(c => c.id === catId);
+            const titleEl = document.getElementById('active-manage-category-title');
+            const deleteBtn = document.getElementById('delete-category-btn');
+
+            if (activeCat) {
+                titleEl.innerText = `Items in "${activeCat.name}":`;
+                const isDefaultCat = ['proteins', 'veggies', 'aromatics', 'prepActions'].includes(activeCat.id);
+                if (!isDefaultCat) {
+                    deleteBtn.classList.remove('hidden');
+                } else {
+                    deleteBtn.classList.add('hidden');
+                }
+            }
+
+            renderManageCategoryList();
+        }
+
+        function renderManageCategoryList() {
+            const container = document.getElementById('category-items-manage-list');
+            const activeCat = categories.find(c => c.id === currentManageCategoryTabId);
+
+            if (!activeCat || !activeCat.items || activeCat.items.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 italic py-2">No items in this category.</p>`;
+                return;
+            }
+
+            container.innerHTML = activeCat.items.map((item, idx) => `
+                <div class="flex items-center justify-between p-2 bg-slate-50 rounded-xl border border-slate-200">
+                    <span class="text-xs text-slate-700 font-medium">${escapeHtml(item)}</span>
+                    <button onclick="deleteCategoryItem(${idx})" class="text-slate-400 hover:text-red-500 text-xs p-1">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function handleCreateNewCategory(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-category-name-input');
+            const name = input.value.trim();
+            if (!name) return;
+
+            const newId = 'cat-' + Date.now();
+            categories.push({ id: newId, name: name, items: [] });
+            saveCategoriesToStorage();
+            renderManageCategoryTabs();
+            switchManageCategoryTab(newId);
+            input.value = '';
+            showToast(`Created category "${name}"`);
+        }
+
+        function deleteCurrentCategory() {
+            const activeCat = categories.find(c => c.id === currentManageCategoryTabId);
+            if (!activeCat) return;
+
+            if (confirm(`Delete category "${activeCat.name}" and all its items?`)) {
+                categories = categories.filter(c => c.id !== currentManageCategoryTabId);
+                saveCategoriesToStorage();
+                renderManageCategoryTabs();
+                switchManageCategoryTab(categories[0]?.id || 'proteins');
+                showToast("Category deleted.");
+            }
+        }
+
+        function handleAddNewCategoryItem(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-category-item-input');
+            const val = input.value.trim();
+            if (!val) return;
+
+            const activeCat = categories.find(c => c.id === currentManageCategoryTabId);
+            if (activeCat) {
+                activeCat.items.push(val);
+                saveCategoriesToStorage();
+                renderManageCategoryList();
+                input.value = '';
+                showToast(`Added '${val}' to ${activeCat.name}`);
+            }
+        }
+
+        function deleteCategoryItem(index) {
+            const activeCat = categories.find(c => c.id === currentManageCategoryTabId);
+            if (activeCat) {
+                activeCat.items.splice(index, 1);
+                saveCategoriesToStorage();
+                renderManageCategoryList();
+            }
+        }
+
+        // --- Save Preset Modal Handlers ---
+        function openSavePresetModal() {
+            const text = generateWhatsAppFormattedText();
+            if (!text) {
+                showToast("Please add items before saving a preset!");
+                return;
+            }
+            document.getElementById('save-preset-name-input').value = '';
+            document.getElementById('save-preset-modal').classList.remove('hidden');
+        }
+
+        function closeSavePresetModal() {
+            document.getElementById('save-preset-modal').classList.add('hidden');
+        }
+
+        function confirmSaveCurrentPreset() {
+            const nameInput = document.getElementById('save-preset-name-input');
+            const name = nameInput.value.trim();
+            if (!name) {
+                showToast("Please enter a preset name!");
+                return;
+            }
+
+            const newPreset = {
+                id: 'preset-' + Date.now(),
+                name: name,
+                data: JSON.parse(JSON.stringify(mealState))
+            };
+
+            presets.push(newPreset);
+            savePresetsToStorage();
+            closeSavePresetModal();
+            showToast(`Saved preset "${name}"!`);
+        }
+
+        // --- WhatsApp Output Formatting ---
+        function generateWhatsAppFormattedText() {
+            let lines = [];
+
+            if (mealState.babyLunch && mealState.babyLunch.length > 0) {
+                lines.push("*Baby’s lunch:*");
+                mealState.babyLunch.forEach(item => {
+                    const formattedItem = item.startsWith('-') ? item : `- ${item}`;
+                    lines.push(formattedItem);
+                });
+                lines.push("");
+            }
+
+            if (mealState.babyDinner && mealState.babyDinner.length > 0) {
+                lines.push("*Baby’s dinner:*");
+                mealState.babyDinner.forEach(item => {
+                    const formattedItem = item.startsWith('-') ? item : `- ${item}`;
+                    lines.push(formattedItem);
+                });
+                lines.push("");
+            }
+
+            if (mealState.ourDinner && mealState.ourDinner.length > 0) {
+                lines.push("*Our dinner:*");
+                mealState.ourDinner.forEach(item => {
+                    const formattedItem = item.startsWith('-') ? item : `- ${item}`;
+                    lines.push(formattedItem);
+                });
+                lines.push("");
+            }
+
+            if (mealState.customNotes && mealState.customNotes.trim().length > 0) {
+                lines.push("*Notes / Instructions:*");
+                const notesItems = mealState.customNotes.split('\n');
+                notesItems.forEach(line => {
+                    if (line.trim().length > 0) {
+                        const formattedLine = line.trim().startsWith('-') ? line.trim() : `- ${line.trim()}`;
+                        lines.push(formattedLine);
+                    }
+                });
+            }
+
+            return lines.join("\n").trim();
+        }
+
+        function updateWhatsAppPreview() {
+            const text = generateWhatsAppFormattedText();
+            const previewEl = document.getElementById('whatsapp-preview-text');
+
+            if (!text) {
+                previewEl.innerHTML = `<span class="text-slate-400 italic">Your message preview will appear here as you select items...</span>`;
+                return;
+            }
+
+            let htmlFormatted = escapeHtml(text)
+                .replace(/\*(.*?)\*/g, '<strong class="font-bold text-slate-900">$1</strong>')
+                .replace(/\n/g, '<br>');
+
+            previewEl.innerHTML = htmlFormatted;
+        }
+
+        // --- Presets Management ---
+        function renderPresetButtons() {
+            const container = document.getElementById('preset-buttons-container');
+
+            if (!presets || presets.length === 0) {
+                container.innerHTML = `<span class="text-xs text-slate-400 italic">No saved presets. Click 'Manage Presets' to add.</span>`;
+                return;
+            }
+
+            container.innerHTML = presets.map(preset => `
+                <button onclick="applyPreset('${preset.id}')" class="text-xs px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold border border-amber-200/80 transition-all active:scale-95 flex items-center gap-1.5">
+                    <i class="fa-regular fa-star text-amber-600"></i> ${escapeHtml(preset.name)}
+                </button>
+            `).join('');
+        }
+
+        function applyPreset(presetId) {
+            const target = presets.find(p => p.id === presetId);
+            if (target) {
+                mealState = JSON.parse(JSON.stringify(target.data));
+                renderActiveItemsList();
+                updateWhatsAppPreview();
+                showToast(`Loaded preset: "${target.name}"`);
+            }
+        }
+
+        function openManagePresetsModal() {
+            const modal = document.getElementById('presets-modal');
+            const container = document.getElementById('custom-presets-list');
+
+            if (!presets || presets.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 italic py-4 text-center">No presets saved yet.</p>`;
+            } else {
+                container.innerHTML = presets.map(p => `
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-800">${escapeHtml(p.name)}</span>
+                            <div class="flex items-center gap-1">
+                                <button onclick="applyPreset('${p.id}'); closeManagePresetsModal();" class="px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700">Apply</button>
+                                <button onclick="openEditPresetModal('${p.id}')" class="p-1 text-slate-400 hover:text-emerald-600 text-xs"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deletePreset('${p.id}')" class="p-1 text-slate-400 hover:text-red-500 text-xs"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        </div>
+                        <div class="text-[11px] text-slate-500 bg-white p-2 rounded-lg border border-slate-100 space-y-0.5">
+                            <div><strong>Baby Lunch:</strong> ${p.data.babyLunch?.join(', ') || 'None'}</div>
+                            <div><strong>Baby Dinner:</strong> ${p.data.babyDinner?.join(', ') || 'None'}</div>
+                            <div><strong>Our Dinner:</strong> ${p.data.ourDinner?.join(', ') || 'None'}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeManagePresetsModal() {
+            document.getElementById('presets-modal').classList.add('hidden');
+        }
+
+        function openEditPresetModal(presetId) {
+            const p = presets.find(x => x.id === presetId);
+            if (!p) return;
+
+            document.getElementById('edit-preset-id').value = presetId;
+            document.getElementById('edit-preset-name-input').value = p.name;
+            document.getElementById('edit-preset-modal').classList.remove('hidden');
+        }
+
+        function closeEditPresetModal() {
+            document.getElementById('edit-preset-modal').classList.add('hidden');
+        }
+
+        function savePresetEdit() {
+            const presetId = document.getElementById('edit-preset-id').value;
+            const newName = document.getElementById('edit-preset-name-input').value.trim();
+
+            const p = presets.find(x => x.id === presetId);
+            if (p && newName) {
+                p.name = newName;
+                savePresetsToStorage();
+                closeEditPresetModal();
+                openManagePresetsModal();
+                showToast("Preset updated.");
+            }
+        }
+
+        function updateCurrentSelectionToPreset() {
+            const presetId = document.getElementById('edit-preset-id').value;
+            const p = presets.find(x => x.id === presetId);
+            if (p) {
+                p.data = JSON.parse(JSON.stringify(mealState));
+                savePresetsToStorage();
+                closeEditPresetModal();
+                openManagePresetsModal();
+                showToast("Preset updated with current selections!");
+            }
+        }
+
+        function deletePreset(presetId) {
+            if (confirm("Delete this preset?")) {
+                presets = presets.filter(p => p.id !== presetId);
+                savePresetsToStorage();
+                openManagePresetsModal();
+                showToast("Preset deleted.");
+            }
+        }
+
+        // --- Clipboard & WhatsApp Export ---
+        function copyToClipboard() {
+            const text = generateWhatsAppFormattedText();
+            if (!text) {
+                showToast("Nothing to copy!");
+                return;
+            }
+
+            const textarea = document.createElement("textarea");
+            textarea.value = text;
+            textarea.style.position = "fixed";
+            textarea.style.opacity = "0";
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast("Copied to clipboard!");
+            } catch (err) {
+                showToast("Failed to copy text.");
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+
+        function sendToWhatsApp() {
+            const text = generateWhatsAppFormattedText();
+            if (!text) {
+                showToast("Please add items before sending!");
+                return;
+            }
+
+            const encodedText = encodeURIComponent(text);
+            const whatsappUrl = `https://wa.me/?text=${encodedText}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // --- Toast Helpers ---
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            toastMsg.innerText = message;
+            
+            toast.classList.remove('translate-y-10', 'opacity-0', 'pointer-events-none');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0', 'pointer-events-none');
+            }, 2500);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
